@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCheck - Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .results-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .score {
+            font-size: 24px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .excellent { color: #2ecc71; }
+        .good { color: #f39c12; }
+        .poor { color: #e74c3c; }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #0077cc;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="results-card">
+        <h1>Your Security Score</h1>
+        <div class="score {{ score_class }}">{{ score }}/{{ total }}</div>
+        <p>{{ feedback }}</p>
+        <a href="/">Go Home</a>
+        <a href="/checklist">Try Again</a>
+    </div>
+</body>
+</html>
