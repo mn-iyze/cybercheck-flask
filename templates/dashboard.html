@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Security Progress | CyberCheck</title>
+    <style>
+        :root {
+            --primary: #0077cc;
+            --primary-dark: #005fa3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .dashboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        .dashboard-header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .stat-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+        .chart-container {
+            padding: 20px;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background: rgba(0, 119, 204, 0.1);
+        }
+        .trend-indicator {
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        .trend-up {
+            color: var(--success);
+        }
+        .trend-down {
+            color: var(--danger);
+        }
+        @media (max-width: 600px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Your Security Progress</h1>
+            <p>Track your cybersecurity improvements over time</p>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Current Score</h3>
+                <div class="stat-value" id="current-score">--</div>
+                <div id="current-trend" class="trend-indicator"></div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Attempts</h3>
+                <div class="stat-value" id="total-attempts">--</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="progressChart"></canvas>
+        </div>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/checklist" class="nav-link">Take Checklist</a>
+        </div>
+    </div>
+
+    <script>
+        async function loadProgressData() {
+            const response = await fetch('/progress-data');
+            const data = await response.json();
+
+            const scores = data.scores;
+            const dates = data.dates;
+            const total = data.total;
+
+            if (scores.length > 0) {
+                const currentScore = scores[scores.length - 1];
+                const previousScore = scores.length > 1 ? scores[scores.length - 2] : null;
+
+                document.getElementById('current-score').textContent = `${currentScore}/${total}`;
+                document.getElementById('total-attempts').textContent = scores.length;
+
+                const trendElement = document.getElementById('current-trend');
+                if (previousScore !== null) {
+                    if (currentScore > previousScore) {
+                        trendElement.innerHTML = '<span class="trend-up">▲ Improving</span>';
+                    } else if (currentScore < previousScore) {
+                        trendElement.innerHTML = '<span class="trend-down">▼ Declining</span>';
+                    } else {
+                        trendElement.innerHTML = '<span>➔ No Change</span>';
+                    }
+                }
+            } else {
+                document.getElementById('current-score').textContent = 'No Data';
+                document.getElementById('total-attempts').textContent = '0';
+            }
+
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Security Score Over Time',
+                        data: scores,
+                        borderColor: '#0077cc',
+                        backgroundColor: 'rgba(0, 119, 204, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#0077cc',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#0077cc'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: total
+                        }
+                    }
+                }
+            });
+        }
+
+        loadProgressData();
+    </script>
+</body>
+</html>
