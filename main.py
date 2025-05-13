@@ -104,9 +104,8 @@ def close_db(error):
     if db is not None:
         db.close()
 
-import os
-
-if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 10000))  # 10000 is just a fallback
+if __name__ == '__main__':
+    with app.app_context():
+        init_db()  # <-- manually call init_db before running the app
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
-
